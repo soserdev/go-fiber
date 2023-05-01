@@ -33,8 +33,51 @@ func main() {
 ```
 
 ```bash
-go run main.go
+go run .
 ```
 
 Browse to `http://localhost:3000` and you should see `Hello, World!` on the page.
 
+## Get method returns JSON
+
+Create a `book.go`.
+
+```go
+package main
+
+type Book struct {
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+```
+
+Update the `main.go`
+
+```go
+package main
+
+import (
+	"github.com/gofiber/fiber/v2"
+)
+
+func GetBook(c *fiber.Ctx) error {
+	book := Book{
+		Title:  "Learning Go: An Idiomatic Approach to Real-World Go Programming",
+		Author: "Jon Bodner",
+	}
+	return c.Status(fiber.StatusOK).JSON(book)
+}
+
+func main() {
+	app := fiber.New()
+	app.Get("/", GetBook)
+	app.Listen(":3000")
+}
+```
+
+Now we can get the result.
+
+```bash
+$ curl localhost:3000
+{"title":"Learning Go: An Idiomatic Approach to Real-World Go Programming","author":"Jon Bodner"}
+```
