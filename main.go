@@ -2,10 +2,11 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/somnidev/go-fiber/model"
 )
 
 func GetBook(c *fiber.Ctx) error {
-	book := Book{
+	book := model.Book{
 		Title:  "Learning Go: An Idiomatic Approach to Real-World Go Programming",
 		Author: "Jon Bodner",
 	}

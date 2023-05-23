@@ -81,3 +81,45 @@ Now we can get the result.
 $ curl localhost:3000
 {"title":"Learning Go: An Idiomatic Approach to Real-World Go Programming","author":"Jon Bodner"}
 ```
+
+### Refactoring to packages
+
+Rename package from `go-fiber` to `github.com/somnidev/go-fiber`.
+
+```bash
+go mod edit -module github.com/somnidev/go-fiber
+```
+
+Move `book.go` to new subdirectory `model` and rename package to `model`.
+
+```go
+package model
+
+type Book struct {
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+```
+
+Now import the new package `github.com/somnidev/go-fiber/model` and use the **package name** `model` to access the `Book` - use `model.Book`.
+
+```go
+package main
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/somnidev/go-fiber/model"
+)
+func GetBook(c *fiber.Ctx) error {
+	book := model.Book{
+		Title:  "Learning Go: An Idiomatic Approach to Real-World Go Programming",
+		Author: "Jon Bodner",
+	}
+	return c.Status(fiber.StatusOK).JSON(book)
+}
+func main() {
+	app := fiber.New()
+	app.Get("/", GetBook)
+	app.Listen(":3000")
+}
+```
