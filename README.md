@@ -123,3 +123,24 @@ func main() {
 	app.Listen(":3000")
 }
 ```
+
+### Create a new Book
+
+We need a [`BodyParser`](https://docs.gofiber.io/api/ctx/#bodyparser) to get the JSON in the body.
+
+```go
+func CreateBook(c *fiber.Ctx) error {
+	b := new(model.Book)
+	if err := c.BodyParser(b); err != nil {
+		return err
+	}
+	return c.Status(fiber.StatusCreated).JSON(b)
+}
+```
+
+Now we can test the new endpoint.
+
+```bash
+curl -X POST -H "Content-Type: application/json" --data "{\"title\":\"book-title\",\"author\":\"john doe\"}" localhost:3000/books
+```
+
