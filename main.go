@@ -3,17 +3,18 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/somnidev/go-fiber/model"
+	"github.com/somnidev/go-fiber/services"
 )
 
-func GetBook(c *fiber.Ctx) error {
-	book := model.Book{
-		Title:  "Learning Go: An Idiomatic Approach to Real-World Go Programming",
-		Author: "Jon Bodner",
-	}
-	return c.Status(fiber.StatusOK).JSON(book)
+var (
+	bookService *services.BookService
+)
+
+func GetBooks(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(services.ListBooks(bookService))
 }
 
-func CreateBook(c *fiber.Ctx) error {
+func CreateBooks(c *fiber.Ctx) error {
 	b := new(model.Book)
 	if err := c.BodyParser(b); err != nil {
 		return err
@@ -23,9 +24,9 @@ func CreateBook(c *fiber.Ctx) error {
 
 func main() {
 	app := fiber.New()
+	bookService, _ = services.NewBookService()
 
-	app.Get("/books", GetBook)
-	app.Post("/books", CreateBook)
-
+	app.Get("/books", GetBooks)
+	app.Post("/books", CreateBooks)
 	app.Listen(":3000")
 }
