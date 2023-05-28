@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/google/uuid"
 	"github.com/somnidev/go-fiber/model"
 )
 
@@ -9,10 +10,13 @@ type BookService struct {
 }
 
 func NewBookService() (*BookService, error) {
+	uuid1 := uuid.New().String()
+	uuid2 := uuid.New().String()
+	uuid3 := uuid.New().String()
 	bs := map[string]model.Book{
-		"001": {Title: "Learning Go: An Idiomatic Approach to Real-World Go Programming", Author: "Jon Bodner"},
-		"002": {Title: "Introduction to Algorithms, fourth edition 4th", Author: "Thomas H. Cormen"},
-		"003": {Title: "Clean Code: A Handbook of Agile Software Craftsmanship", Author: "Robert C. Martin"},
+		uuid1: {ID: uuid1, Title: "Learning Go: An Idiomatic Approach to Real-World Go Programming", Author: "Jon Bodner"},
+		uuid2: {ID: uuid2, Title: "Introduction to Algorithms, fourth edition 4th", Author: "Thomas H. Cormen"},
+		uuid3: {ID: uuid3, Title: "Clean Code: A Handbook of Agile Software Craftsmanship", Author: "Robert C. Martin"},
 	}
 	return &BookService{books: bs}, nil
 }
@@ -23,4 +27,11 @@ func ListBooks(bookService *BookService) []model.Book {
 		books = append(books, value)
 	}
 	return books
+}
+
+func CreateBook(bookService *BookService, book model.Book) model.Book {
+	uuid := uuid.New().String()
+	book.ID = uuid
+	bookService.books[uuid] = book
+	return book
 }

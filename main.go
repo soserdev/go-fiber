@@ -14,12 +14,13 @@ func GetBooks(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(services.ListBooks(bookService))
 }
 
-func CreateBooks(c *fiber.Ctx) error {
+func CreateBook(c *fiber.Ctx) error {
 	b := new(model.Book)
 	if err := c.BodyParser(b); err != nil {
 		return err
 	}
-	return c.Status(fiber.StatusCreated).JSON(b)
+	nb := services.CreateBook(bookService, *b)
+	return c.Status(fiber.StatusCreated).JSON(nb)
 }
 
 func main() {
@@ -27,6 +28,6 @@ func main() {
 	bookService, _ = services.NewBookService()
 
 	app.Get("/books", GetBooks)
-	app.Post("/books", CreateBooks)
+	app.Post("/books", CreateBook)
 	app.Listen(":3000")
 }

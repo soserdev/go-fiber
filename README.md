@@ -229,7 +229,82 @@ $ curl -s localhost:3000/books | jq
 
 ### Add a `UUID`
 
-Let's add a `UUID`.
+Let's add an `ID` to our `model.Book`, where we store the `UUID`.
+
+```go
+package model
+
+type Book struct {
+	ID     string `json:"id"`
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+```
+
+Now change the `BookService`.
+
+```go
+package services
+
+import (
+	"github.com/google/uuid"
+	"github.com/somnidev/go-fiber/model"
+)
+
+type BookService struct {
+	books map[string]model.Book
+}
+
+func NewBookService() (*BookService, error) {
+	uuid1 := uuid.New().String()
+	uuid2 := uuid.New().String()
+	uuid3 := uuid.New().String()
+	bs := map[string]model.Book{
+		uuid1: {ID: uuid1, Title: "Learning Go: An Idiomatic Approach to Real-World Go Programming", Author: "Jon Bodner"},
+		uuid2: {ID: uuid2, Title: "Introduction to Algorithms, fourth edition 4th", Author: "Thomas H. Cormen"},
+		uuid3: {ID: uuid3, Title: "Clean Code: A Handbook of Agile Software Craftsmanship", Author: "Robert C. Martin"},
+	}
+	return &BookService{books: bs}, nil
+}
+
+func ListBooks(bookService *BookService) []model.Book {
+	books := make([]model.Book, 0, len(bookService.books))
+	for _, value := range bookService.books {
+		books = append(books, value)
+	}
+	return books
+}
+```
+
+And add a new method called `CreateBook`.
+
+```go
+func CreateBook(bookService *BookService, book model.Book) model.Book {
+	uuid := uuid.New().String()
+	book.ID = uuid
+	bookService.books[uuid] = book
+	return book
+}
+```
+
+Finally we update our `CreateBook` method in our `main.go` to use the service.
+
+```go
+func CreateBook(c *fiber.Ctx) error {
+	b := new(model.Book)
+	if err := c.BodyParser(b); err != nil {
+		return err
+	}
+	nb := services.CreateBook(bookService, *b)
+	return c.Status(fiber.StatusCreated).JSON(nb)
+}
+```
+
+That's it. Now we can add a book which will be store in our service.
+
+```bash
+curl -X POST -H "Content-Type: application/json" --data "{\"title\":\"The miracle of John Doe\",\"author\":\"john doe\"}" localhost:3000/books
+```
 
 ### Refactor to Dependency Injection
 
