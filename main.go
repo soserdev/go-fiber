@@ -11,7 +11,7 @@ var (
 )
 
 func GetBooks(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusOK).JSON(services.ListBooks(bookService))
+	return c.Status(fiber.StatusOK).JSON(bookService.ListBooks())
 }
 
 func CreateBook(c *fiber.Ctx) error {
@@ -19,7 +19,7 @@ func CreateBook(c *fiber.Ctx) error {
 	if err := c.BodyParser(b); err != nil {
 		return err
 	}
-	nb := services.CreateBook(bookService, *b)
+	nb := bookService.CreateBook(*b)
 	return c.Status(fiber.StatusCreated).JSON(nb)
 }
 

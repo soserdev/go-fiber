@@ -21,7 +21,7 @@ func NewBookService() (*BookService, error) {
 	return &BookService{books: bs}, nil
 }
 
-func ListBooks(bookService *BookService) []model.Book {
+func (bookService *BookService) ListBooks() []model.Book {
 	books := make([]model.Book, 0, len(bookService.books))
 	for _, value := range bookService.books {
 		books = append(books, value)
@@ -29,7 +29,7 @@ func ListBooks(bookService *BookService) []model.Book {
 	return books
 }
 
-func CreateBook(bookService *BookService, book model.Book) model.Book {
+func (bookService *BookService) CreateBook(book model.Book) model.Book {
 	uuid := uuid.New().String()
 	book.ID = uuid
 	bookService.books[uuid] = book

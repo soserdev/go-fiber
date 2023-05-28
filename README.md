@@ -306,6 +306,62 @@ That's it. Now we can add a book which will be store in our service.
 curl -X POST -H "Content-Type: application/json" --data "{\"title\":\"The miracle of John Doe\",\"author\":\"john doe\"}" localhost:3000/books
 ```
 
+### Refactor to use method receivers
+
+First we refactor the `BookService`.
+
+```go
+--- a/services/bookService.go
++++ b/services/bookService.go
+
+-func ListBooks(bookService *BookService) []model.Book {
++func (bookService *BookService) ListBooks() []model.Book {
+ 	books := make([]model.Book, 0, len(bookService.books))
+	for _, value := range bookService.books {
+		books = append(books, value)
+	}
+	return books
+}
+-func CreateBook(bookService *BookService, book model.Book) model.Book {
++func (bookService *BookService) CreateBook(book model.Book) model.Book {
+        uuid := uuid.New().String()
+        book.ID = uuid
+        bookService.books[uuid] = book
+	return book
+}
+```
+
+Then we have to refactor `main.go`.
+
+```go
+--- a/main.go
++++ b/main.go
+ func GetBooks(c *fiber.Ctx) error {
+-       return c.Status(fiber.StatusOK).JSON(services.ListBooks(bookService))
++       return c.Status(fiber.StatusOK).JSON(bookService.ListBooks())
+ }
+
+ func CreateBook(c *fiber.Ctx) error {
+        if err := c.BodyParser(b); err != nil {
+                return err
+        }
+-       nb := services.CreateBook(bookService, *b)
++       nb := bookService.CreateBook(*b)
+        return c.Status(fiber.StatusCreated).JSON(nb)
+ }
+```
+
 ### Refactor to Dependency Injection
 
 In order to understand how you properly do Dependency Injection in Go visit [Dependency Injection Explained](https://markphelps.me/posts/dependency-injection-explained/).
+
+First we add a new package `controllers` for our controllers and a file `controllers.go`.
+
+### Get a book using its `UUID`
+
+### Delete a book
+
+### Update a book
+
+### Patch a book
+
