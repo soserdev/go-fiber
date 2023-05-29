@@ -21,17 +21,22 @@ func NewBookService() (*BookService, error) {
 	return &BookService{books: bs}, nil
 }
 
+func (bookService *BookService) CreateBook(book model.Book) model.Book {
+	uuid := uuid.New().String()
+	book.ID = uuid
+	bookService.books[uuid] = book
+	return book
+}
+
+func (bookService *BookService) GetBookById(id string) (model.Book, bool) {
+	b, found := bookService.books[id]
+	return b, found
+}
+
 func (bookService *BookService) ListBooks() []model.Book {
 	books := make([]model.Book, 0, len(bookService.books))
 	for _, value := range bookService.books {
 		books = append(books, value)
 	}
 	return books
-}
-
-func (bookService *BookService) CreateBook(book model.Book) model.Book {
-	uuid := uuid.New().String()
-	book.ID = uuid
-	bookService.books[uuid] = book
-	return book
 }

@@ -303,7 +303,36 @@ func CreateBook(c *fiber.Ctx) error {
 That's it. Now we can add a book which will be store in our service.
 
 ```bash
-curl -X POST -H "Content-Type: application/json" --data "{\"title\":\"The miracle of John Doe\",\"author\":\"john doe\"}" localhost:3000/books
+$ curl -X POST -H "Content-Type: application/json" --data "{\"title\":\"The miracle of John Doe\",\"author\":\"John Doe\"}" localhost:3000/books
+{"id":"8f00940d-3361-4043-a356-27d9b3001c46","title":"The miracle of John Doe","author":"John Doe"
+```
+
+And check the result.
+
+```bash
+curl -s localhost:3000/books | jq
+[
+  {
+    "id": "8f00940d-3361-4043-a356-27d9b3001c46",
+    "title": "The miracle of John Doe",
+    "author": "John Doe"
+  },
+  {
+    "id": "819d58e1-99dd-4fbd-ad58-6febcd9fee15",
+    "title": "Learning Go: An Idiomatic Approach to Real-World Go Programming",
+    "author": "Jon Bodner"
+  },
+  {
+    "id": "f93ff1d7-b8dc-44f4-b716-f4548aa8b046",
+    "title": "Introduction to Algorithms, fourth edition 4th",
+    "author": "Thomas H. Cormen"
+  },
+  {
+    "id": "a2e34b28-0a81-4a99-8155-a0a854c0efa0",
+    "title": "Clean Code: A Handbook of Agile Software Craftsmanship",
+    "author": "Robert C. Martin"
+  }
+]
 ```
 
 ### Refactor to use method receivers
@@ -351,17 +380,78 @@ Then we have to refactor `main.go`.
  }
 ```
 
-### Refactor to Dependency Injection
-
-In order to understand how you properly do Dependency Injection in Go visit [Dependency Injection Explained](https://markphelps.me/posts/dependency-injection-explained/).
-
-First we add a new package `controllers` for our controllers and a file `controllers.go`.
-
 ### Get a book using its `UUID`
+
+First we add a new method the `BookService`that gets the book.
+
+```go
+func (bookService *BookService) GetBookById(id string) (model.Book, bool) {
+	b, found := bookService.books[id]
+	return b, found
+}
+```
+
+Now we add a new handler to `main.go`.
+
+```go
+
+func GetBookById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	log.Println(id)
+	b, found := bookService.GetBookById(id)
+	if !found {
+		c.Status(fiber.StatusNotFound)
+		return nil
+	}
+	return c.Status(fiber.StatusOK).JSON(b)
+}
+```
+
+The [Params Method](https://docs.gofiber.io/api/ctx/#params) `c.Params("id")` can be used to get the route parameters, you could pass an optional default value that will be returned if the param key does not exist. The signature of the Params Method looks like this.
+
+```go
+func (c *Ctx) Params(key string, defaultValue ...string) string
+```
+
+And finally we need to add a new route.
+
+```go
+app.Get("/books/:id", GetBookById)
+```
+
+If we try to get a book that does not exist, we get a `404`.
+
+```bash
+curl -v localhost:3000/books/XYZ
+*   Trying 127.0.0.1:3000...
+* Connected to localhost (127.0.0.1) port 3000 (#0)
+> GET /books/XYZ HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/7.86.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404 Not Found
+< Date: Mon, 29 May 2023 10:31:18 GMT
+< Content-Length: 0
+<
+* Connection #0 to host localhost left intact
+```
+
 
 ### Delete a book
 
 ### Update a book
 
 ### Patch a book
+
+### Use a Concurrent Map
+
+Since there may occur some racing conditions we should use a [concurrent map](https://pkg.go.dev/github.com/orcaman/concurrent-map#section-readme).
+
+### Refactor to Dependency Injection
+
+In order to understand how you properly do Dependency Injection in Go visit [Dependency Injection Explained](https://markphelps.me/posts/dependency-injection-explained/).
+
+First we add a new package `controllers` for our controllers and a file `controllers.go`.
 
