@@ -40,3 +40,7 @@ func (bookService *BookService) ListBooks() []model.Book {
 	}
 	return books
 }
+
+func (bookService *BookService) DeleteBookById(id string) {
+	delete(bookService.books, id)
+}

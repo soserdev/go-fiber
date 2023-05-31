@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/somnidev/go-fiber/model"
 	"github.com/somnidev/go-fiber/services"
@@ -14,7 +12,6 @@ var (
 
 func GetBookById(c *fiber.Ctx) error {
 	id := c.Params("id")
-	log.Println(id)
 	b, found := bookService.GetBookById(id)
 	if !found {
 		c.Status(fiber.StatusNotFound)
@@ -40,6 +37,13 @@ func CreateBook(c *fiber.Ctx) error {
 	return nil
 }
 
+func DeleteBookById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	bookService.DeleteBookById(id)
+	c.Status(fiber.StatusNoContent)
+	return nil
+}
+
 func main() {
 	app := fiber.New()
 	bookService, _ = services.NewBookService()
@@ -47,5 +51,6 @@ func main() {
 	app.Get("/books/:id", GetBookById).Name("books.id")
 	app.Get("/books", GetBooks)
 	app.Post("/books", CreateBook)
+	app.Delete("/books/:id", DeleteBookById)
 	app.Listen(":3000")
 }

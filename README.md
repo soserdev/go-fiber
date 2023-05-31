@@ -247,7 +247,7 @@ type Book struct {
 }
 ```
 
-Now change the `BookService`.
+Now update the `BookService`.
 
 ```go
 package services
@@ -282,7 +282,7 @@ func ListBooks(bookService *BookService) []model.Book {
 }
 ```
 
-And add a new method called `CreateBook`.
+Add a new method called `CreateBook`.
 
 ```go
 func CreateBook(bookService *BookService, book model.Book) model.Book {
@@ -494,6 +494,32 @@ Note: Unnecessary use of -X or --request, POST is already inferred.
 
 
 ### Delete a book
+
+In order to delete a book we need to add a new method called `` to the `BookService`.
+
+```go
+func (bookService *BookService) DeleteBookById(id string) {
+	delete(bookService.books, id)
+}
+```
+
+Now we can add a new controller method to our `main.go`. We return a `204` even if the book is not found.
+
+```go
+func DeleteBookById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	bookService.DeleteBookById(id)
+	c.Status(fiber.StatusNoContent)
+	return nil
+}
+```
+
+We add a new route to our `main.go`.
+
+```go
+app.Delete("/books/:id", DeleteBookById)
+```
+
 
 ### Update a book
 
