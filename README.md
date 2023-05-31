@@ -124,9 +124,9 @@ func main() {
 }
 ```
 
-### Create a new Book
+### Rest endoint to Create a new Book
 
-We need a [`BodyParser`](https://docs.gofiber.io/api/ctx/#bodyparser) to get the JSON in the body.
+Now we add a new method called `CreateBook` to our `main.go` file. We need a [`BodyParser`](https://docs.gofiber.io/api/ctx/#bodyparser) to get the JSON in the body.
 
 ```go
 func CreateBook(c *fiber.Ctx) error {
@@ -136,6 +136,12 @@ func CreateBook(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusCreated).JSON(b)
 }
+```
+
+We also add a new route in our `main.go` file.
+
+```go
+app.Post("/books", CreateBook)
 ```
 
 Now we can test the new endpoint.
@@ -177,7 +183,7 @@ func ListBooks(bookService *BookService) []model.Book {
 }
 ```
 
-We also have to init our `BookServie` in `main.go`.
+We also have to init our `BookServie` in `main.go` and change our `GetBooks` method to return a list of books.
 
 ```go
 package main
@@ -438,20 +444,68 @@ curl -v localhost:3000/books/XYZ
 * Connection #0 to host localhost left intact
 ```
 
+### Add a `Location` header to the Create Request
+
+In order to follow best practices, the `CreateBook` method should return a `Location` response header. Therefore we update the route in `main.go` to create the location url.
+
+```go
+app.Get("/books/:id", GetBookById).Name("books.id")
+```
+
+Now we can update the `CreateBook` method. The `GetRouteURL` uses the name we defined above.
+
+```go
+func CreateBook(c *fiber.Ctx) error {
+	b := new(model.Book)
+	if err := c.BodyParser(b); err != nil {
+		return err
+	}
+	nb := bookService.CreateBook(*b)
+
+	location, _ := c.GetRouteURL("books.id", fiber.Map{"id": nb.ID})
+	c.Location(location)
+	c.Status(fiber.StatusCreated)
+	return nil
+}
+```
+
+Now let's check the Create Request.
+
+```bash
+curl -v -X POST -H "Content-Type: application/json" --data "{\"title\":\"The miracle of John Doe\",\"author\":\"John Doe\"}" localhost:3000/books
+Note: Unnecessary use of -X or --request, POST is already inferred.
+*   Trying 127.0.0.1:3000...
+* Connected to localhost (127.0.0.1) port 3000 (#0)
+> POST /books HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/7.86.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 55
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 201 Created
+< Date: Tue, 30 May 2023 17:28:27 GMT
+< Content-Length: 0
+< Location: /books/e6364fbd-1724-4c4e-b807-f5d4be222293
+<
+* Connection #0 to host localhost left intact
+```
+
 
 ### Delete a book
 
 ### Update a book
-
-### Patch a book
-
-### Use a Concurrent Map
-
-Since there may occur some racing conditions we should use a [concurrent map](https://pkg.go.dev/github.com/orcaman/concurrent-map#section-readme).
 
 ### Refactor to Dependency Injection
 
 In order to understand how you properly do Dependency Injection in Go visit [Dependency Injection Explained](https://markphelps.me/posts/dependency-injection-explained/).
 
 First we add a new package `controllers` for our controllers and a file `controllers.go`.
+
+### Use a Concurrent Map
+
+Golang Maos are not thread-safe, see [
+Concurrent Map Writing and Reading in Go, or how to deal with the data races](https://webdevstation.com/posts/concurrent-map-writing-and-reading-in-go/). There may occur some racing conditions we should use a [concurrent map](https://pkg.go.dev/github.com/orcaman/concurrent-map#section-readme).
+
 

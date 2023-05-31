@@ -33,14 +33,18 @@ func CreateBook(c *fiber.Ctx) error {
 		return err
 	}
 	nb := bookService.CreateBook(*b)
-	return c.Status(fiber.StatusCreated).JSON(nb)
+
+	location, _ := c.GetRouteURL("books.id", fiber.Map{"id": nb.ID})
+	c.Location(location)
+	c.Status(fiber.StatusCreated)
+	return nil
 }
 
 func main() {
 	app := fiber.New()
 	bookService, _ = services.NewBookService()
 
-	app.Get("/books/:id", GetBookById)
+	app.Get("/books/:id", GetBookById).Name("books.id")
 	app.Get("/books", GetBooks)
 	app.Post("/books", CreateBook)
 	app.Listen(":3000")
