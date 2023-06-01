@@ -576,11 +576,70 @@ curl -v -X PUT -H "Content-Type: application/json" --data "{\"title\":\"The mira
 
 In order to understand how you properly do Dependency Injection in Go visit [Dependency Injection Explained](https://markphelps.me/posts/dependency-injection-explained/).
 
-First we add a new package `controllers` for our controllers and a file `controllers.go`.
+First we add a new package `controllers` for our controllers and a file `controllers.go` where we put our controllers and a constructor `NewBookController`.
+
+```go
+package controllers
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/somnidev/go-fiber/model"
+	"github.com/somnidev/go-fiber/services"
+)
+
+type BookController struct {
+	bookService *services.BookService
+}
+
+func NewBookController(bs *services.BookService) (*BookController, error) {
+	return &BookController{bookService: bs}, nil
+}
+
+func (bc *BookController) GetBookById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	b, found := bc.bookService.GetBookById(id)
+	if !found {
+		c.Status(fiber.StatusNotFound)
+		return nil
+	}
+	return c.Status(fiber.StatusOK).JSON(b)
+}
+...
+```
+
+Now we have to create a new `NewBookController` and inject our `BookService` in our `main.go`.
+
+```go
+package main
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/somnidev/go-fiber/controllers"
+	"github.com/somnidev/go-fiber/services"
+)
+
+var (
+	bookService *services.BookService
+)
+
+func main() {
+	app := fiber.New()
+	bookService, _ = services.NewBookService()
+	bookController, _ := controllers.NewBookController(bookService)
+
+	app.Get("/books/:id", bookController.GetBookById).Name("books.id")
+	app.Get("/books", bookController.GetBooks)
+	app.Post("/books", bookController.CreateBook)
+	app.Delete("/books/:id", bookController.DeleteBookById)
+	app.Put("/books/:id", bookController.UpdateBookById)
+	app.Listen(":3000")
+}
+```
+
 
 ### Use a Concurrent Map
 
-Golang Maos are not thread-safe, see [
+Golang Maps are not thread-safe, see [
 Concurrent Map Writing and Reading in Go, or how to deal with the data races](https://webdevstation.com/posts/concurrent-map-writing-and-reading-in-go/). There may occur some racing conditions we should use a [concurrent map](https://pkg.go.dev/github.com/orcaman/concurrent-map#section-readme).
 
 
