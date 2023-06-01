@@ -523,6 +523,55 @@ app.Delete("/books/:id", DeleteBookById)
 
 ### Update a book
 
+First we create a new method in the `BookService`.
+
+```go
+func (bookService *BookService) UpdateBookById(id string, book model.Book) {
+	_, found := bookService.books[id]
+	if !found {
+		return
+	}
+	book.ID = id
+	bookService.books[id] = book
+}
+```
+
+>**Note:** If the book is not found nothing will happen!
+
+Now we update the `main.go` and add a new controller method.
+
+```go
+func UpdateBookById(c *fiber.Ctx) error {
+	b := new(model.Book)
+	if err := c.BodyParser(b); err != nil {
+		return err
+	}
+	id := c.Params("id")
+	bookService.UpdateBookById(id, *b)
+	c.Status(fiber.StatusNoContent)
+	return nil
+}
+```
+
+We add a new route to `main.go`.
+
+```go
+app.Put("/books/:id", UpdateBookById)
+```
+
+Now we can test the new code. First we create a new book.
+
+```bash
+curl -v -X POST -H "Content-Type: application/json" --data "{\"title\":\"The miracle of John Doe\",\"author\":\"John Doe\"}" localhost:3000/books
+```
+
+Now we update it.
+
+```bash
+curl -v -X PUT -H "Content-Type: application/json" --data "{\"title\":\"The miracle of John Doe, 2nd ed\",\"author\":\"John Doe, Jane Smith\"}" localhost:3000/books/6dc0e604-d189-4267-acc6-36bbe9d7ec05
+```
+
+
 ### Refactor to Dependency Injection
 
 In order to understand how you properly do Dependency Injection in Go visit [Dependency Injection Explained](https://markphelps.me/posts/dependency-injection-explained/).

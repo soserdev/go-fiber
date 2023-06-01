@@ -44,3 +44,12 @@ func (bookService *BookService) ListBooks() []model.Book {
 func (bookService *BookService) DeleteBookById(id string) {
 	delete(bookService.books, id)
 }
+
+func (bookService *BookService) UpdateBookById(id string, book model.Book) {
+	_, found := bookService.books[id]
+	if !found {
+		return
+	}
+	book.ID = id
+	bookService.books[id] = book
+}

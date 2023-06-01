@@ -44,6 +44,17 @@ func DeleteBookById(c *fiber.Ctx) error {
 	return nil
 }
 
+func UpdateBookById(c *fiber.Ctx) error {
+	b := new(model.Book)
+	if err := c.BodyParser(b); err != nil {
+		return err
+	}
+	id := c.Params("id")
+	bookService.UpdateBookById(id, *b)
+	c.Status(fiber.StatusNoContent)
+	return nil
+}
+
 func main() {
 	app := fiber.New()
 	bookService, _ = services.NewBookService()
@@ -52,5 +63,6 @@ func main() {
 	app.Get("/books", GetBooks)
 	app.Post("/books", CreateBook)
 	app.Delete("/books/:id", DeleteBookById)
+	app.Put("/books/:id", UpdateBookById)
 	app.Listen(":3000")
 }
