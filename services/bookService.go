@@ -22,9 +22,9 @@ func NewBookService() (*BookService, error) {
 }
 
 func (bookService *BookService) CreateBook(book model.Book) model.Book {
-	uuid := uuid.New().String()
-	book.ID = uuid
-	bookService.books[uuid] = book
+	bookId := uuid.New().String()
+	book.ID = bookId
+	bookService.books[bookId] = book
 	return book
 }
 
