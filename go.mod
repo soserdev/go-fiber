@@ -1,4 +1,4 @@
-module github.com/somnidev/go-fiber
+module github.com/soserdev/go-fiber
 
 go 1.20
 

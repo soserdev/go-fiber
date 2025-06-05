@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/somnidev/go-fiber/controllers"
-	"github.com/somnidev/go-fiber/services"
+	"github.com/soserdev/go-fiber/controllers"
+	"github.com/soserdev/go-fiber/services"
 )
 
 var (
@@ -20,5 +20,8 @@ func main() {
 	app.Post("/books", bookController.CreateBook)
 	app.Delete("/books/:id", bookController.DeleteBookById)
 	app.Put("/books/:id", bookController.UpdateBookById)
-	app.Listen(":3000")
+	err := app.Listen(":3000")
+	if err != nil {
+		return
+	}
 }

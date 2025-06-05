@@ -87,7 +87,7 @@ $ curl localhost:3000
 Rename package from `go-fiber` to `github.com/somnidev/go-fiber`.
 
 ```bash
-go mod edit -module github.com/somnidev/go-fiber
+go mod edit -module github.com/soserdev/go-fiber
 ```
 
 Move `book.go` to new subdirectory `model` and rename package to `model`.

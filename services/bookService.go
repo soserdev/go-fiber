@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/google/uuid"
-	"github.com/somnidev/go-fiber/model"
+	"github.com/soserdev/go-fiber/model"
 )
 
 type BookService struct {

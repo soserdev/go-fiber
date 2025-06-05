@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/somnidev/go-fiber/model"
-	"github.com/somnidev/go-fiber/services"
+	"github.com/soserdev/go-fiber/model"
+	"github.com/soserdev/go-fiber/services"
 )
 
 type BookController struct {
