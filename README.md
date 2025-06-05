@@ -1,8 +1,41 @@
 # Go Fiber
 
+This is a short workshopt that shows how to create a simple CRUD microservice using  [Fiber](https://docs.gofiber.io).
+
 [Fiber](https://docs.gofiber.io) is an Express inspired web framework built on top of Fasthttp, the fastest HTTP engine for Go. Designed to ease things up for fast development with zero memory allocation and performance in mind.
 
-## Installation​
+If you have finished the workshop or if you simply checkout this project then you can create, get, update and delete some books.
+
+**Get all Books:**
+
+```bash
+curl localhost:3000/books
+[{"id":"84779244-6ad7-4d11-afa1-8288b0653bce","title":"Learning Go: An Idiomatic Approach to Real-World Go Programming","author":"Jon Bodner"},{"id":"183c1202-023d-4425-871e-1ed81293990c","title":"Introduction to Algorithms, fourth edition 4th","author":"Thomas H. Cormen"},{"id":"c1f47742-dbf9-4242-9a5f-03648397e8d9","title":"Clean Code: A Handbook of Agile Software Craftsmanship","author":"Robert C. Martin"}]
+```   
+
+**Get one book:**
+
+```bash
+$ curl localhost:3000/books/84779244-6ad7-4d11-afa1-8288b0653bce
+{"id":"84779244-6ad7-4d11-afa1-8288b0653bce","title":"Learning Go: An Idiomatic Approach to Real-World Go Programming","author":"Jon Bodner"}
+```
+
+**Create a book:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" --data "{\"title\":\"book-title\",\"author\":\"john doe\"}" localhost:3000/books
+```
+
+**Delete a book**
+
+Delete `book` with id `84779244-6ad7-4d11-afa1-8288b0653bce`
+```bash
+curl -X DELETE http://localhost:3000/books/84779244-6ad7-4d11-afa1-8288b0653bce
+```
+
+The following sections are about how to create this app from scratch!
+
+## Install Fiber
 
 First of all, download and install Go. 1.17 or higher is required.
 
@@ -12,7 +45,7 @@ Installation is done using the go get command:
 go get github.com/gofiber/fiber/v2
 ```
 
-## Introduction
+## Create hello world
 
 Create file `main.go`  and a hello-world.
 
