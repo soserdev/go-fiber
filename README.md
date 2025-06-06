@@ -1,12 +1,16 @@
 # Go Fiber
 
-This is a short workshopt that shows how to create a simple CRUD microservice using  [Fiber](https://docs.gofiber.io).
+This is a short workshop that shows how to create a simple CRUD microservice using  [Fiber](https://docs.gofiber.io).
 
 [Fiber](https://docs.gofiber.io) is an Express inspired web framework built on top of Fasthttp, the fastest HTTP engine for Go. Designed to ease things up for fast development with zero memory allocation and performance in mind.
 
 If you have finished the workshop or if you simply checkout this project then you can create, get, update and delete some books.
 
-**Get all Books:**
+## Introduction
+
+The app offers a RESTful interface to get, create, and delete `Book`s.
+
+**Get all books:**
 
 ```bash
 curl localhost:3000/books
@@ -35,11 +39,21 @@ curl -X DELETE http://localhost:3000/books/84779244-6ad7-4d11-afa1-8288b0653bce
 
 The following sections are about how to create this app from scratch!
 
-## Install Fiber
+## Initialize the app
 
-First of all, download and install Go. 1.17 or higher is required.
+Using the terminal, create a directory for your code called `go-fiber` and change into it.
 
-Installation is done using the go get command:
+```bash
+mkdir go-fiber && cd go-fiber
+```
+
+Now create a module using the `go mod init` command and give it the path of the module your code will be in.
+
+```bash
+go mod init github.com/soserdev/go-fiber
+```
+
+Let's add fiber using the `go get` command.
 
 ```bash
 go get github.com/gofiber/fiber/v2
